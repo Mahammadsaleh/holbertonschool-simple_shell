@@ -42,7 +42,8 @@ char **line_devider(char *buffer)
 int main(void)
 {
 	char *buffer = NULL;
-	size_t len = 1024, read;
+	size_t len = 1024;
+	long unsigned int read;
 	pid_t pid;
 	char **arr;
 	int i;
