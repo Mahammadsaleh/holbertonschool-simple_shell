@@ -17,8 +17,8 @@ char **line_devider(char *buffer)
 	char *token;
 	int i = 0, k;
 
-	arr = malloc(strlen(buffer) * sizeof(char *));
-	for (k = 0; k < arr[i]; k++)
+	arr = malloc(250 * sizeof(char *));
+	for (k = 0; k < 250; k++)
 	{
 		arr[i] = NULL;
 	}
@@ -28,6 +28,7 @@ char **line_devider(char *buffer)
 	token = strtok(buffer," \n\t");
 	while (token)
 	{
+		arr[i] = malloc(strlen(buffer));
 		arr[i] = strdup(token);
 		if (arr[i] == NULL)
 		{
