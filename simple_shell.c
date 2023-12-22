@@ -63,15 +63,15 @@ char **get_input(char **buffer, size_t *len)
  *
  * Return - nothing
  */
-void free_array(char **arr)
+void free_array(char ***arr)
 {
 	int i;
 
-	for (i = 0; arr[i] != NULL; i++)
+	for (i = 0; *arr[i] != NULL; i++)
 	{
-		free(arr[i]);
+		free(*arr[i]);
 	}
-	free(arr);
+	free(*arr);
 }
 /**
  * main - main func
@@ -80,21 +80,16 @@ void free_array(char **arr)
  */
 int main(void)
 {
-	char *buffer = NULL;
+	char *buffer = NULL, **arr;
 	size_t len = 1024;
-	int read;
+	int read, i, status;
 	pid_t pid;
-	char **arr;
-	int i;
 
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
-			printf("$ ");
-		read = getline(&buffer, &len, stdin);
-		if (read == -1)
+		arr = get_input(&buffer, &len);
+		if (arr == NULL)
 			break;
-		arr = line_devider(buffer);
 		if (arr[0] == NULL)
 		{
 			free(arr);
@@ -103,7 +98,7 @@ int main(void)
 		pid = fork();
 		if (pid == 0)
 		{
-			if (execve(arr[0],arr, NULL) == -1)
+			if (execve(arr[0], arr, NULL) == -1)
 			{
 				perror("ERROR");
 				exit(1);
@@ -111,23 +106,16 @@ int main(void)
 		}
 		else if (pid > 0)
 		{
-			int status;
 			if (wait(&status) == -1)
 			{
 				perror("ERROR");
 			}
 		}
 		else
-		{
 			perror("ERROR");
-		}
 		if (pid == -1)
 			perror("ERROR");
-		for (i = 0; arr[i] != NULL; i++)
-		{
-			free(arr[i]);
-		}
-		free(arr);
+		free_array(&arr);
 	}
 	free(buffer);
 	return (0);
