@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 #define CHAR_BUFFER 1024
 /**
  * line_devider - devide the line
