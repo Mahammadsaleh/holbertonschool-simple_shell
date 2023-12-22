@@ -59,13 +59,23 @@ int main(void)
 		pid = fork();
 		if (pid == 0)
 		{
-			execve(arr[0],arr, NULL);
-			perror("ERROR");
-			exit(1);
+			if (execve(arr[0],arr, NULL) == -1);
+			{
+				perror("ERROR");
+				exit(1);
+			}
+		}
+		else if (pid > 0)
+		{
+			int status;
+			if (wait(&status) == -1)
+			{
+				perror("ERROR");
+			}
 		}
 		else
 		{
-			wait(NULL);
+			perror("ERROR");
 		}
 		if (pid == -1)
 			perror("ERROR");
