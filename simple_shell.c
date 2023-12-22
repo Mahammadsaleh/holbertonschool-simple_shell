@@ -36,7 +36,7 @@ char **line_devider(char *buffer)
 	return (arr);
 }
 /**
- * shell_input - input part
+ * get_input - input part
  * @len: len
  * @buffer: buff
  *
