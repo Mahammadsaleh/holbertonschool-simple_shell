@@ -20,7 +20,7 @@ char **line_devider(char *buffer)
 	arr = malloc(strlen(buffer) * sizeof(char *));
 	if (arr == NULL)
 		return (NULL);
-	token = strtok(buffer," \n\t");
+	token = strtok(buffer, " \n\t");
 	while (token)
 	{
 		arr[i] = strdup(token);
@@ -30,10 +30,48 @@ char **line_devider(char *buffer)
 			exit(1);
 		}
 		i++;
-		token = strtok(NULL," \n\t");
+		token = strtok(NULL, " \n\t");
 	}
 	arr[i] = NULL;
 	return (arr);
+}
+/**
+ * shell_input - input part
+ * @len: len
+ * @buffer: buff
+ *
+ * Return: void
+ */
+char **get_input(char **buffer, size_t *len)
+{
+	int read;
+	char **arr;
+
+	if (isatty(STDIN_FILENO))
+		printf("$ ");
+	read = getline(buffer, len, stdin);
+	if (read == -1)
+	{
+		return (NULL);
+	}
+	arr = line_devider(*buffer);
+	return (arr);
+}
+/**
+ * free_array - free array memory
+ * @arr: buffer
+ *
+ * Return - nothing
+ */
+void free_array(char **arr)
+{
+	int i;
+
+	for (i = 0; arr[i] != NULL; i++)
+	{
+		free(arr[i]);
+	}
+	free(arr);
 }
 /**
  * main - main func
