@@ -18,6 +18,11 @@ char **line_devider(char *buffer)
 	int i = 0;
 
 	arr = malloc(strlen(buffer) * sizeof(char *));
+	for (k = 0; k < arr[i]; k++)
+	{
+		arr[i] = NULL;
+	}
+
 	if (arr == NULL)
 		return (NULL);
 	token = strtok(buffer," \n\t");
