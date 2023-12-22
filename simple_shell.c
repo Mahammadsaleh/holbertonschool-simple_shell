@@ -50,7 +50,8 @@ int main(void)
 
 	while (1)
 	{
-		printf("$ ");
+		if (isatty(STDIN_FILENO))
+			printf("$ ");
 		read = getline(&buffer, &len, stdin);
 		if (read == -1)
 			break;
