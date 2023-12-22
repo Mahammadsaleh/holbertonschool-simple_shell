@@ -56,35 +56,27 @@ int main(void)
 		read = getline(&buffer, &len, stdin);
 		if (read == -1)
 		{
-			free(buffer);
 			break;
 		}
 		arr = line_devider(buffer);
 		pid = fork();
 		if (pid == 0)
 		{
+			free(buffer);
 			if (execve(arr[0],arr, NULL) == -1)
 			{
-				for (i = 0; arr[i] != NULL; i++)
+	                	for (i = 0; arr[i] != NULL; i++)
                 		{
                         		free(arr[i]);
-                		}
-				free(arr);
+               			}
+                		free(arr);
 				perror("ERROR");
 				exit(1);
 			}
 		}
-		else if (pid > 0)
-		{
-			int status;
-			if (wait(&status) == -1)
-			{
-				perror("ERROR");
-			}
-		}
 		else
 		{
-			perror("ERROR");
+			wait(NULL);
 		}
 		if (pid == -1)
 			perror("ERROR");
