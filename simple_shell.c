@@ -15,7 +15,7 @@ char **line_devider(char *buffer)
 {
 	char **arr;
 	char *token;
-	int i = 0;
+	int i = 0, k;
 
 	arr = malloc(strlen(buffer) * sizeof(char *));
 	for (k = 0; k < arr[i]; k++)
