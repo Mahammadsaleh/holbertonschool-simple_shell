@@ -70,7 +70,6 @@ int main(void)
                         		free(arr[i]);
                			}
                 		free(arr);
-				perror("ERROR");
 				exit(1);
 			}
 		}
