@@ -63,7 +63,6 @@ int main(void)
 		pid = fork();
 		if (pid == 0)
 		{
-			free(buffer);
 			if (execve(arr[0],arr, NULL) == -1)
 			{
 				for (i = 0; arr[i] != NULL; i++)
