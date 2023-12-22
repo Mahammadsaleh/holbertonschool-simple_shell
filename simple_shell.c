@@ -55,13 +55,22 @@ int main(void)
 			printf("$ ");
 		read = getline(&buffer, &len, stdin);
 		if (read == -1)
+		{
+			free(buffer);
 			break;
+		}
 		arr = line_devider(buffer);
 		pid = fork();
 		if (pid == 0)
 		{
+			free(buffer);
 			if (execve(arr[0],arr, NULL) == -1)
 			{
+				for (i = 0; arr[i] != NULL; i++)
+                		{
+                        		free(arr[i]);
+                		}
+				free(arr);
 				perror("ERROR");
 				exit(1);
 			}
