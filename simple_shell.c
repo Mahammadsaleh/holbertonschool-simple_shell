@@ -5,92 +5,83 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #define CHAR_BUFFER 1024
-/**
- * line_devider - devide the line
- * @buffer: string
- *
- * Return: char ptr to ptr
- */
+
 char **line_devider(char *buffer)
 {
-	char **arr;
-	char *token;
-	int i = 0, k;
+    char **arr;
+    char *token;
+    int i = 0;
 
-	arr = malloc(250 * sizeof(char *));
-	for (k = 0; k < 250; k++)
-	{
-		arr[i] = NULL;
-	}
-
-	if (arr == NULL)
-		return (NULL);
-	token = strtok(buffer," \n\t");
-	while (token)
-	{
-		arr[i] = malloc(strlen(buffer));
-		arr[i] = strdup(token);
-		if (arr[i] == NULL)
-		{
-			perror("ERROR");
-				exit(1);
-		}
-		i++;
-		token = strtok(NULL," \n\t");
-	}
-	arr[i] = NULL;
-	return (arr);
+    arr = malloc(strlen(buffer) * sizeof(char *));
+    if (arr == NULL)
+        return (NULL);
+    token = strtok(buffer," \n\t");
+    while (token)
+    {
+        arr[i] = strdup(token);
+        if (arr[i] == NULL)
+        {
+            perror("ERROR");
+            exit(1);
+        }
+        i++;
+        token = strtok(NULL," \n\t");
+    }
+    arr[i] = NULL;
+    return (arr);
 }
-/**
- * main - main func
- *
- * Return: int
- */
+
 int main(void)
 {
-	char *buffer = NULL;
-	size_t len = 1024;
-	int read;
-	pid_t pid;
-	char **arr;
-	int i;
+    char *buffer = NULL;
+    size_t len = 1024;
+    int read;
+    pid_t pid;
+    char **arr;
+    int i;
 
-	while (1)
-	{
-		if (isatty(STDIN_FILENO))
-			printf("$ ");
-		read = getline(&buffer, &len, stdin);
-		if (read == -1)
-		{
-			break;
-		}
-		arr = line_devider(buffer);
-		pid = fork();
-		if (pid == 0)
-		{
-			free(buffer);
-			if (execve(arr[0],arr, NULL) == -1)
-			{
-	                	for (i = 0; arr[i] != NULL; i++)
-                		{
-                        		free(arr[i]);
-               			}
-                		free(arr);
-				exit(1);
-			}
-		}
-		else
-		{
-			wait(NULL);
-		}
-		if (pid == -1)
-			perror("ERROR");
-		for (i = 0; arr[i] != NULL; i++)
-		{
-			free(arr[i]);
-		}
-		free(arr);
-	}
-	free(buffer);
-	return (0);
+    while (1)
+    {
+        if (isatty(STDIN_FILENO))
+            printf("$ ");
+        read = getline(&buffer, &len, stdin);
+        if (read == -1)
+            break;
+        arr = line_devider(buffer);
+        if (arr[0] == NULL) // Check if arr[0] is NULL
+        {
+            free(arr);
+            continue;
+        }
+        pid = fork();
+        if (pid == 0)
+        {
+            if (execve(arr[0],arr, NULL) == -1)
+            {
+                perror("ERROR");
+                exit(1);
+            }
+        }
+        else if (pid > 0)
+        {
+            int status;
+            if (wait(&status) == -1)
+            {
+                perror("ERROR");
+            }
+        }
+        else
+        {
+            perror("ERROR");
+        }
+        if (pid == -1)
+            perror("ERROR");
+        for (i = 0; arr[i] != NULL; i++)
+        {
+            free(arr[i]);
+        }
+        free(arr);
+    }
+    free(buffer);
+    return (0);
 }
