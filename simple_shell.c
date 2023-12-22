@@ -48,7 +48,7 @@ int main(void)
         if (read == -1)
             break;
         arr = line_devider(buffer);
-        if (arr[0] == NULL) // Check if arr[0] is NULL
+        if (arr[0] == NULL)
         {
             free(arr);
             continue;
