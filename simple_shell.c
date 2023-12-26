@@ -76,6 +76,30 @@ void free_array(char ***arr)
 	}
 	free(*arr);
 }
+char *path_handler(char *file_name)
+{
+	char *path = getenv("PATH");
+	char *token = strtok(path, ":");
+	char cmd[100];
+	if (file_name[0] == '/')
+	{
+		if (access(file_name, X_OK) == 0)
+		{
+			return strdup(file_name);
+		}
+		return NULL;
+	}
+	while (token)
+	{
+		snprintf(cmd,sizeof(cmd),"%s/%s",token,file_name);
+		if (access(cmd, X_OK) == 0)
+		{
+			return strdup(cmd);
+		}
+		token = strtok(NULL, ":");
+	}
+	return (NULL);
+}
 /**
  * main - main func
  *
@@ -101,6 +125,7 @@ int main(void)
 		pid = fork();
 		if (pid == 0)
 		{
+			arr[0] = path_handler(arr[0]);
 			if (execve(arr[0], arr, NULL) == -1)
 			{
 				perror("ERROR");
