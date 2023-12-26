@@ -100,7 +100,7 @@ char *path_handler(char *file_name)
 		token = strtok(NULL, ":");
 	}
 	free(token);
-	return (NULL);
+	return strdup(file_name);
 }
 /**
  * main - main func
@@ -127,13 +127,7 @@ int main(void)
 		pid = fork();
 		if (pid == 0)
 		{
-			*arr = path_handler(arr[0]);
-			if (arr[0] == NULL)
-			{
-				fprintf(stderr, "Command not found\n");
-				free_array(&arr);
-				exit(1);
-			}
+			arr[0] = path_handler(arr[0]);
 			if (execvp(arr[0], arr) == -1)
 			{
 				perror("ERROR");
