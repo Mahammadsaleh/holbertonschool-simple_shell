@@ -99,7 +99,7 @@ char *path_handler(char *file_name)
 		}
 		token = strtok(NULL, ":");
 	}
-	token = strdup(file_name);
+	free(token);
 	return (NULL);
 }
 /**
