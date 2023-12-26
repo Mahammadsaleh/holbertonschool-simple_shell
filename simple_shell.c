@@ -127,7 +127,7 @@ int main(void)
 		pid = fork();
 		if (pid == 0)
 		{
-			arr[0] = path_handler(arr[0]);
+			*arr = path_handler(arr[0]);
 			if (arr[0] == NULL)
 			{
 				fprintf(stderr, "Command not found\n");
