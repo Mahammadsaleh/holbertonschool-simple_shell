@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+
 #define CHAR_BUFFER 1024
 /**
  * line_devider - devide the line
@@ -98,6 +99,7 @@ char *path_handler(char *file_name)
 		}
 		token = strtok(NULL, ":");
 	}
+	token = strdup(file_name);
 	return (NULL);
 }
 /**
@@ -111,16 +113,6 @@ int main(void)
 	size_t len = 1024;
 	int status;
 	pid_t pid;
-
-	char *path_value = getenv("PATH");
-	if (path_value != NULL)
-	{
-		printf("PATH: %s\n", path_value);
-	}
-	else
-	{
-		fprintf(stderr, "PATH environment variable not found\n");
-	}
 
 	while (1)
 	{
