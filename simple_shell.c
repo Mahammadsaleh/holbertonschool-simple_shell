@@ -134,7 +134,7 @@ int main(void)
 				free_array(&arr);
 				exit(1);
 			}
-			if (execve(arr[0], arr, NULL) == -1)
+			if (execvp(arr[0], arr) == -1)
 			{
 				perror("ERROR");
 				exit(1);
