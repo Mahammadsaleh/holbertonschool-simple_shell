@@ -128,7 +128,7 @@ int main(void)
 		if (pid == 0)
 		{
 			arr[0] = path_handler(arr[0]);
-			if (execvp(arr[0], arr) == -1)
+			if (execve(arr[0], arr, NULL) == -1)
 			{
 				perror("ERROR");
 				exit(1);
