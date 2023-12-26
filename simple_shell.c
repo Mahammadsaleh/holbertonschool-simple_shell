@@ -112,6 +112,16 @@ int main(void)
 	int status;
 	pid_t pid;
 
+	char *path_value = getenv("PATH");
+	if (path_value != NULL)
+	{
+		printf("PATH: %s\n", path_value);
+	}
+	else
+	{
+		fprintf(stderr, "PATH environment variable not found\n");
+	}
+
 	while (1)
 	{
 		arr = get_input(&buffer, &len);
