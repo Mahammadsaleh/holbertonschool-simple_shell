@@ -17,9 +17,12 @@ char **line_devider(char *buffer)
 	char *token;
 	int i = 0;
 
-	arr = malloc(strlen(buffer) * sizeof(char *));
+	arr = malloc((strlen(buffer) + 1) * sizeof(char *));
 	if (arr == NULL)
-		return (NULL);
+	{
+		perror("ERROR");
+		exit(1);
+	}
 	token = strtok(buffer, " \n\t");
 	while (token)
 	{
@@ -67,9 +70,9 @@ void free_array(char ***arr)
 {
 	int i;
 
-	for (i = 0; *arr[i] != NULL; i++)
+	for (i = 0; (*arr)[i] != NULL; i++)
 	{
-		free(*arr[i]);
+		free((*arr)[i]);
 	}
 	free(*arr);
 }
@@ -82,7 +85,7 @@ int main(void)
 {
 	char *buffer = NULL, **arr;
 	size_t len = 1024;
-	int read, i, status;
+	int status;
 	pid_t pid;
 
 	while (1)
@@ -92,7 +95,7 @@ int main(void)
 			break;
 		if (arr[0] == NULL)
 		{
-			free(arr);
+			free_array(&arr);
 			continue;
 		}
 		pid = fork();
