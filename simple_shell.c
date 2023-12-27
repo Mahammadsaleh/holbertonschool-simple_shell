@@ -103,7 +103,7 @@ char *path_handler(char *file_name)
  *
  * Return: int
  */
-int main(void)
+int main(int argc, char **argv, char* envp[])
 {
 	char *buffer = NULL, **arr;
 	size_t len = 1024;
@@ -123,7 +123,7 @@ int main(void)
 		if (pid == 0)
 		{
 			arr[0] = path_handler(arr[0]);
-			if (execve(arr[0], arr, NULL) == -1)
+			if (execve(arr[0], arr, envp) == -1)
 			{
 				perror("ERROR");
 				exit(1);
