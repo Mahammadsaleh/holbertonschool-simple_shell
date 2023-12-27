@@ -110,9 +110,8 @@ char *path_handler(char *file_name)
 int main(int argc, char **argv)
 {
 	extern char **environ;
-	int size = argc;
 	char *buffer = NULL, **arr;
-	size_t len = 1024;
+	size_t len = argc * 512;
 	int status;
 	pid_t pid;
 	while (1)
