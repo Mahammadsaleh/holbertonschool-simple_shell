@@ -4,20 +4,18 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-
 #define CHAR_BUFFER 1024
 /**
- * line_devider - devide the line
+ * line_divider - divide the line
  * @buffer: string
  *
  * Return: char ptr to ptr
  */
-char **line_devider(char *buffer)
+char **line_divider(char *buffer)
 {
 	char **arr;
 	char *token;
 	int i = 0;
-
 	arr = malloc((strlen(buffer) + 1) * sizeof(char *));
 	if (arr == NULL)
 	{
@@ -37,7 +35,7 @@ char **line_devider(char *buffer)
 		token = strtok(NULL, " \n\t");
 	}
 	arr[i] = NULL;
-	return (arr);
+	return arr;
 }
 /**
  * get_input - input part
@@ -50,27 +48,25 @@ char **get_input(char **buffer, size_t *len)
 {
 	int read;
 	char **arr;
-
 	if (isatty(STDIN_FILENO))
 		printf("$ ");
 	read = getline(buffer, len, stdin);
 	if (read == -1)
 	{
-		return (NULL);
+		return NULL;
 	}
-	arr = line_devider(*buffer);
-	return (arr);
+	arr = line_divider(*buffer);
+	return arr;
 }
 /**
  * free_array - free array memory
  * @arr: buffer
  *
- * Return - nothing
+ * Return: nothing
  */
 void free_array(char ***arr)
 {
 	int i;
-
 	for (i = 0; (*arr)[i] != NULL; i++)
 	{
 		free((*arr)[i]);
@@ -80,8 +76,14 @@ void free_array(char ***arr)
 char *path_handler(char *file_name)
 {
 	char *path = getenv("PATH");
-	char *token = strtok(path, ":");
-	char cmd[100];
+	char *token, *cmd;
+	cmd = malloc(strlen(file_name) + strlen(path) + 2);
+	if (cmd == NULL)
+	{
+		perror("ERROR");
+		exit(1);
+	}
+	token = strtok(path, ":");
 	if (file_name[0] == '/')
 	{
 		if (access(file_name, X_OK) == 0)
@@ -92,14 +94,14 @@ char *path_handler(char *file_name)
 	}
 	while (token)
 	{
-		snprintf(cmd,sizeof(cmd),"%s/%s",token,file_name);
+		snprintf(cmd, strlen(file_name) + strlen(token) + 2, "%s/%s", token, file_name);
 		if (access(cmd, X_OK) == 0)
 		{
-			return strdup(cmd);
+			return cmd;
 		}
 		token = strtok(NULL, ":");
 	}
-	free(token);
+	free(cmd);
 	return strdup(file_name);
 }
 /**
@@ -113,7 +115,6 @@ int main(void)
 	size_t len = 1024;
 	int status;
 	pid_t pid;
-
 	while (1)
 	{
 		arr = get_input(&buffer, &len);
@@ -142,11 +143,13 @@ int main(void)
 			}
 		}
 		else
+		{
 			perror("ERROR");
+		}
 		if (pid == -1)
 			perror("ERROR");
 		free_array(&arr);
 	}
 	free(buffer);
-	return (0);
+	return 0;
 }
