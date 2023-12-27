@@ -89,7 +89,7 @@ char *path_handler(char *file_name)
         {
             return strdup(file_name);
         }
-        return NULL;
+        return strdup(file_name);
     }
     while (token)
     {
