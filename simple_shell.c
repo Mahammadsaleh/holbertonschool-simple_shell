@@ -6,12 +6,12 @@
 #include <fcntl.h>
 #define CHAR_BUFFER 1024
 /**
- * line_divider - divide the line
+ * line_devider - devide the line
  * @buffer: string
  *
  * Return: char ptr to ptr
  */
-char **line_divider(char *buffer)
+char **line_devider(char *buffer)
 {
 	char **arr;
 	char *token;
@@ -35,7 +35,7 @@ char **line_divider(char *buffer)
 		token = strtok(NULL, " \n\t");
 	}
 	arr[i] = NULL;
-	return arr;
+	return (arr);
 }
 /**
  * get_input - input part
@@ -53,16 +53,16 @@ char **get_input(char **buffer, size_t *len)
 	read = getline(buffer, len, stdin);
 	if (read == -1)
 	{
-		return NULL;
+		return (NULL);
 	}
-	arr = line_divider(*buffer);
-	return arr;
+	arr = line_devider(*buffer);
+	return (arr);
 }
 /**
  * free_array - free array memory
  * @arr: buffer
  *
- * Return: nothing
+ * Return - nothing
  */
 void free_array(char ***arr)
 {
@@ -76,14 +76,8 @@ void free_array(char ***arr)
 char *path_handler(char *file_name)
 {
 	char *path = getenv("PATH");
-	char *token, *cmd;
-	cmd = malloc(strlen(file_name) + strlen(path) + 2);
-	if (cmd == NULL)
-	{
-		perror("ERROR");
-		exit(1);
-	}
-	token = strtok(path, ":");
+	char *token = strtok(path, ":");
+	char cmd[100];
 	if (file_name[0] == '/')
 	{
 		if (access(file_name, X_OK) == 0)
@@ -94,14 +88,14 @@ char *path_handler(char *file_name)
 	}
 	while (token)
 	{
-		snprintf(cmd, strlen(file_name) + strlen(token) + 2, "%s/%s", token, file_name);
+		snprintf(cmd,sizeof(cmd),"%s/%s",token,file_name);
 		if (access(cmd, X_OK) == 0)
 		{
-			return cmd;
+			return strdup(cmd);
 		}
 		token = strtok(NULL, ":");
 	}
-	free(cmd);
+	free(token);
 	return strdup(file_name);
 }
 /**
@@ -143,13 +137,11 @@ int main(void)
 			}
 		}
 		else
-		{
 			perror("ERROR");
-		}
 		if (pid == -1)
 			perror("ERROR");
 		free_array(&arr);
 	}
 	free(buffer);
-	return 0;
+	return (0);
 }
