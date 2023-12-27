@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -78,24 +79,31 @@ char *path_handler(char *file_name)
 	char *path = getenv("PATH");
 	char *token = strtok(path, ":");
 	char cmd[100];
+	if (token == NULL)
+	{
+		return  (NULL);
+	}
 	if (file_name[0] == '/')
 	{
 		if (access(file_name, X_OK) == 0)
 		{
+			free(path);
 			return strdup(file_name);
 		}
+		free(path);
 		return NULL;
 	}
 	while (token)
 	{
-		snprintf(cmd,sizeof(cmd),"%s/%s",token,file_name);
+		snprintf(cmd, sizeof(cmd), "%s/%s", token, file_name);
 		if (access(cmd, X_OK) == 0)
 		{
+			free(path);
 			return strdup(cmd);
 		}
 		token = strtok(NULL, ":");
 	}
-	free(token);
+	free(path);
 	return strdup(file_name);
 }
 /**
@@ -123,18 +131,39 @@ int main(void)
 		pid = fork();
 		if (pid == 0)
 		{
+			char *original_command = strdup(arr[0]);
 			arr[0] = path_handler(arr[0]);
-			if (execve(arr[0], arr, environ) == -1)
+			if (arr[0] == NULL || execve(arr[0], arr, environ) == -1)
 			{
-				perror("ERROR");
+				if (arr[0] == NULL || errno == ENOENT)
+				{
+					char error_message[CHAR_BUFFER];
+					snprintf(error_message, sizeof(error_message), "./shell: 1: %s: not found\n", original_command);
+					write(STDERR_FILENO, error_message, strlen(error_message));
+					free(original_command);
+					exit(127);
+				}
+				else
+				{
+					perror("ERROR");
+				}
+				free(original_command);
 				exit(1);
 			}
 		}
 		else if (pid > 0)
 		{
-			if (wait(&status) == -1)
+			if (waitpid(pid, &status, 0) == -1)
 			{
 				perror("ERROR");
+			}
+			if (WIFEXITED(status))
+			{
+				status = WEXITSTATUS(status);
+				if (status == 127)
+				{
+					exit(127);
+				}
 			}
 		}
 		else
