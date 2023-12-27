@@ -76,44 +76,41 @@ void free_array(char ***arr)
 }
 char *path_handler(char *file_name)
 {
-	char *path = getenv("PATH");
-	char *token = strtok(path, ":");
-	char cmd[100];
-	if (token == NULL)
-	{
-		return  (NULL);
-	}
-	if (file_name[0] == '/')
-	{
-		if (access(file_name, X_OK) == 0)
-		{
-			free(path);
-			return strdup(file_name);
-		}
-		free(path);
-		return NULL;
-	}
-	while (token)
-	{
-		snprintf(cmd, sizeof(cmd), "%s/%s", token, file_name);
-		if (access(cmd, X_OK) == 0)
-		{
-			free(path);
-			return strdup(cmd);
-		}
-		token = strtok(NULL, ":");
-	}
-	free(path);
-	return strdup(file_name);
+    char *path = getenv("PATH");
+    char *token = strtok(path, ":");
+    char cmd[100];
+    if (token == NULL)
+    {
+        return  (NULL);
+    }
+    if (file_name[0] == '/')
+    {
+        if (access(file_name, X_OK) == 0)
+        {
+            return strdup(file_name);
+        }
+        return NULL;
+    }
+    while (token)
+    {
+        snprintf(cmd, sizeof(cmd), "%s/%s", token, file_name);
+        if (access(cmd, X_OK) == 0)
+        {
+            return strdup(cmd);
+        }
+        token = strtok(NULL, ":");
+    }
+    return strdup(file_name);
 }
 /**
  * main - main func
  *
  * Return: int
  */
-int main(void)
+int main(int argc, char **argv)
 {
 	extern char **environ;
+	int size = argc;
 	char *buffer = NULL, **arr;
 	size_t len = 1024;
 	int status;
@@ -138,7 +135,7 @@ int main(void)
 				if (arr[0] == NULL || errno == ENOENT)
 				{
 					char error_message[CHAR_BUFFER];
-					snprintf(error_message, sizeof(error_message), "./shell: 1: %s: not found\n", original_command);
+					snprintf(error_message, sizeof(error_message), "%s: 1: %s: not found\n", argv[0], original_command);
 					write(STDERR_FILENO, error_message, strlen(error_message));
 					free(original_command);
 					exit(127);
