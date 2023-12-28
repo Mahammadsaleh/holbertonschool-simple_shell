@@ -126,11 +126,24 @@ int main(int argc, char **argv)
 			char *original_command = strdup(arr[0]);
 			if (path == NULL || *path == '\0')
 			{
-				char error_message[CHAR_BUFFER];
-				snprintf(error_message, sizeof(error_message), "%s: 1: %s: not found\n", argv[0], original_command);
-				write(STDERR_FILENO, error_message, strlen(error_message));
-				free(original_command);
-				exit(127);
+				if (*arr[0] == '/')
+				{
+					arr[0] = path_handler(arr[0], path);
+					if (execve(arr[0], arr, environ) == -1)
+					{
+						perror("ERROR");
+						free(original_command);
+						exit(1);
+					}
+				}
+				else
+				{
+					char error_message[CHAR_BUFFER];
+					snprintf(error_message, sizeof(error_message), "%s: 1: %s: not found\n", argv[0], original_command);
+					write(STDERR_FILENO, error_message, strlen(error_message));
+					free(original_command);
+					exit(127);
+				}
 			}
 			arr[0] = path_handler(arr[0], path);
 			if (execve(arr[0], arr, environ) == -1)
