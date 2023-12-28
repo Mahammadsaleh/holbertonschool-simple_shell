@@ -166,5 +166,5 @@ int main(int argc, char **argv)
 		free_array(&arr);
 	}
 	free(buffer);
-	return (0);
+	return (status);
 }
