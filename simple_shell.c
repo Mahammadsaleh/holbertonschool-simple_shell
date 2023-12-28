@@ -74,33 +74,28 @@ void free_array(char ***arr)
 	}
 	free(*arr);
 }
-char *path_handler(char *file_name)
+char *path_handler(char *file_name, char *path)
 {
-    char *path = getenv("PATH");
-    char *token = strtok(path, ":");
-    char cmd[100];
-    if (token == NULL)
-    {
-        return  (NULL);
-    }
-    if (file_name[0] == '/')
-    {
-        if (access(file_name, X_OK) == 0)
-        {
-            return strdup(file_name);
-        }
-        return strdup(file_name);
-    }
-    while (token)
-    {
-        snprintf(cmd, sizeof(cmd), "%s/%s", token, file_name);
-        if (access(cmd, X_OK) == 0)
-        {
-            return strdup(cmd);
-        }
-        token = strtok(NULL, ":");
-    }
-    return strdup(file_name);
+	char *token = strtok(path, ":");
+	char cmd[100];
+
+	if (file_name[0] == '/')
+	{
+		if (access(file_name, X_OK) == 0)
+		{
+			return strdup(file_name);
+		}
+	}
+	while (token)
+	{
+		snprintf(cmd, sizeof(cmd), "%s/%s", token, file_name);
+		if (access(cmd, X_OK) == 0)
+		{
+			return strdup(cmd);
+		}
+		token = strtok(NULL, ":");
+	}
+	return strdup(file_name);
 }
 /**
  * main - main func
@@ -114,6 +109,7 @@ int main(int argc, char **argv)
 	size_t len = argc * 512;
 	int status;
 	pid_t pid;
+	char *path = getenv("PATH");
 	while (1)
 	{
 		arr = get_input(&buffer, &len);
@@ -128,8 +124,7 @@ int main(int argc, char **argv)
 		if (pid == 0)
 		{
 			char *original_command = strdup(arr[0]);
-			arr[0] = path_handler(arr[0]);
-			if (arr[0] == NULL)
+			if (path == NULL || *path == '\0')
 			{
 				char error_message[CHAR_BUFFER];
 				snprintf(error_message, sizeof(error_message), "%s: 1: %s: not found\n", argv[0], original_command);
@@ -137,7 +132,8 @@ int main(int argc, char **argv)
 				free(original_command);
 				exit(127);
 			}
-			else if (execve(arr[0], arr, environ) == -1)
+			arr[0] = path_handler(arr[0], path);
+			if (execve(arr[0], arr, environ) == -1)
 			{
 				perror("ERROR");
 				free(original_command);
@@ -152,8 +148,8 @@ int main(int argc, char **argv)
 			}
 			if (WIFEXITED(status))
 			{
-				status = WEXITSTATUS(status);
-				if (status == 127)
+				int exit_status = WEXITSTATUS(status);
+				if (exit_status == 127)
 				{
 					exit(127);
 				}
