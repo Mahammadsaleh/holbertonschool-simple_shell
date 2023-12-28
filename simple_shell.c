@@ -67,18 +67,18 @@ char **get_input(char **buffer, size_t *len)
  *
  * Return - nothing
  */
-void free_array(char ***arr)
+void free_array(char **arr)
 {
 	int i;
 
-	if (*arr == NULL)
+	if (arr == NULL)
 		return;
-	for (i = 0; (*arr)[i] != NULL; i++)
+	for (i = 0; arr[i] != NULL; i++)
 	{
-		free((*arr)[i]);
+		free(arr[i]);
 	}
-	free(*arr);
-	*arr = NULL;
+	free(arr);
+	arr = NULL;
 }
 /**
  * path_handler - path handler
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 			break;
 		if (arr[0] == NULL)
 		{
-			free_array(&arr);
+			free_array(arr);
 			continue;
 		}
 		pid = fork();
@@ -148,8 +148,7 @@ int main(int argc, char **argv)
 					{
 						perror("ERROR");
 						free(original_command);
-						free_array(&arr);
-						free(path);
+						free_array(arr);
 						exit(1);
 					}
 				}
@@ -159,8 +158,7 @@ int main(int argc, char **argv)
 					snprintf(error_message, sizeof(error_message), "%s: 1: %s: not found\n", argv[0], original_command);
 					write(STDERR_FILENO, error_message, strlen(error_message));
 					free(original_command);
-					free_array(&arr);
-					free(path);
+					free_array(arr);
 					exit(127);
 				}
 			}
@@ -169,8 +167,7 @@ int main(int argc, char **argv)
 			{
 				perror("ERROR");
 				free(original_command);
-				free_array(&arr);
-				free(path);
+				free_array(arr);
 				exit(1);
 			}
 		}
@@ -195,7 +192,7 @@ int main(int argc, char **argv)
 		}
 		if (pid == -1)
 			perror("ERROR");
-		free_array(&arr);
+		free_array(arr);
 	}
 	free(buffer);
 	return (status);
