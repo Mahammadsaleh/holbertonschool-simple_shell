@@ -78,7 +78,6 @@ void free_array(char **arr)
 		free(arr[i]);
 	}
 	free(arr);
-	arr = NULL;
 }
 /**
  * path_handler - path handler
@@ -131,7 +130,6 @@ int main(int argc, char **argv)
 			break;
 		if (arr[0] == NULL)
 		{
-			free_array(arr);
 			continue;
 		}
 		pid = fork();
