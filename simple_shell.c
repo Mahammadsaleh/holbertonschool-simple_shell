@@ -77,6 +77,7 @@ void free_array(char **arr)
 	{
 		free(arr[i]);
 	}
+	free(arr[i]);
 	free(arr);
 }
 /**
@@ -108,7 +109,7 @@ char *path_handler(char *file_name, char *path)
 		}
 		token = strtok(NULL, ":");
 	}
-	return strdup(file_name);
+	return file_name;
 }
 /**
  * main - main func
@@ -161,11 +162,18 @@ int main(int argc, char **argv)
 				}
 			}
 			arr[0] = path_handler(arr[0], path);
+			if (strcmp(arr[0], "exit") == 0)
+                        {
+                                free(buffer);
+                                free_array(arr);
+                                exit(EXIT_SUCCESS);
+                        }
 			if (execve(arr[0], arr, environ) == -1)
 			{
 				perror("ERROR");
 				free(original_command);
 				free_array(arr);
+				free(buffer);
 				exit(1);
 			}
 		}
