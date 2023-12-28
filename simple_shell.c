@@ -53,6 +53,7 @@ char **get_input(char **buffer, size_t *len)
 
 	if (isatty(STDIN_FILENO))
 		printf("$ ");
+		fflush(stdout);
 	read = getline(buffer, len, stdin);
 	if (read == -1)
 	{
@@ -76,6 +77,7 @@ void free_array(char ***arr)
 	for (i = 0; (*arr)[i] != NULL; i++)
 	{
 		free((*arr)[i]);
+		(*arr)[i] = NULL;
 	}
 	free(*arr);
 	*arr = NULL;
@@ -134,6 +136,12 @@ int main(int argc, char **argv)
 			free_array(&arr);
 			continue;
 		}
+		if (strcmp(arr[0], "exit") == 0)
+	 	{	
+			free(arr[0]);
+			free(buffer);
+			exit(0);
+	 	}
 		pid = fork();
 		if (pid == 0)
 		{
@@ -155,9 +163,8 @@ int main(int argc, char **argv)
 				}
 				else
 				{
-					char error_message[CHAR_BUFFER];
-					snprintf(error_message, sizeof(error_message), "%s: 1: %s: not found\n", argv[0], original_command);
-					write(STDERR_FILENO, error_message, strlen(error_message));
+					fprintf(stderr, "%s: 1: %s: not found\n", argv[0], original_command);
+					fflush(stderr);
 					free(original_command);
 					free_array(&arr);
 					free(path);
@@ -170,7 +177,7 @@ int main(int argc, char **argv)
 				perror("ERROR");
 				free(original_command);
 				free_array(&arr);
-				free(path);
+				free(arr);
 				exit(1);
 			}
 		}
@@ -189,14 +196,12 @@ int main(int argc, char **argv)
 				}
 			}
 		}
-		else
-		{
-			perror("ERROR");
-		}
 		if (pid == -1)
 			perror("ERROR");
+			free(arr[0]);
+			free(buffer);
+			exit(EXIT_FAILURE);
 		free_array(&arr);
 	}
-	free(buffer);
 	return (status);
 }
