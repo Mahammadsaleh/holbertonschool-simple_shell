@@ -17,6 +17,7 @@ char **line_devider(char *buffer)
 	char **arr;
 	char *token;
 	int i = 0;
+
 	arr = malloc((strlen(buffer) + 1) * sizeof(char *));
 	if (arr == NULL)
 	{
@@ -49,6 +50,7 @@ char **get_input(char **buffer, size_t *len)
 {
 	int read;
 	char **arr;
+
 	if (isatty(STDIN_FILENO))
 		printf("$ ");
 	read = getline(buffer, len, stdin);
@@ -68,12 +70,24 @@ char **get_input(char **buffer, size_t *len)
 void free_array(char ***arr)
 {
 	int i;
+
+	if (*arr == NULL)
+		return;
 	for (i = 0; (*arr)[i] != NULL; i++)
 	{
 		free((*arr)[i]);
 	}
 	free(*arr);
+	*arr = NULL;
 }
+/**
+ * path_handler - path handler
+ * @file_name: name of file
+ *
+ * @path: path
+ *
+ * return: file_name
+ */
 char *path_handler(char *file_name, char *path)
 {
 	char *token = strtok(path, ":");
@@ -109,7 +123,7 @@ int main(int argc, char **argv)
 	size_t len = argc * 512;
 	int status = 0;
 	pid_t pid;
-	char *path = getenv("PATH");
+
 	while (1)
 	{
 		arr = get_input(&buffer, &len);
@@ -123,6 +137,7 @@ int main(int argc, char **argv)
 		pid = fork();
 		if (pid == 0)
 		{
+			char *path = getenv("PATH");
 			char *original_command = strdup(arr[0]);
 			if (path == NULL || *path == '\0')
 			{
@@ -133,6 +148,8 @@ int main(int argc, char **argv)
 					{
 						perror("ERROR");
 						free(original_command);
+						free_array(&arr);
+						free(path);
 						exit(1);
 					}
 				}
@@ -142,6 +159,8 @@ int main(int argc, char **argv)
 					snprintf(error_message, sizeof(error_message), "%s: 1: %s: not found\n", argv[0], original_command);
 					write(STDERR_FILENO, error_message, strlen(error_message));
 					free(original_command);
+					free_array(&arr);
+					free(path);
 					exit(127);
 				}
 			}
@@ -150,6 +169,8 @@ int main(int argc, char **argv)
 			{
 				perror("ERROR");
 				free(original_command);
+				free_array(&arr);
+				free(path);
 				exit(1);
 			}
 		}
