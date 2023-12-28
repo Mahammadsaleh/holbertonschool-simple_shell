@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 	extern char **environ;
 	char *buffer = NULL, **arr;
 	size_t len = argc * 512;
-	int status;
+	int status = 0;
 	pid_t pid;
 	char *path = getenv("PATH");
 	while (1)
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 			char *original_command = strdup(arr[0]);
 			if (path == NULL || *path == '\0')
 			{
-				if (*arr[0] == '/')
+				if (arr[0][0] == '/')
 				{
 					arr[0] = path_handler(arr[0], path);
 					if (execve(arr[0], arr, environ) == -1)
@@ -169,7 +169,9 @@ int main(int argc, char **argv)
 			}
 		}
 		else
+		{
 			perror("ERROR");
+		}
 		if (pid == -1)
 			perror("ERROR");
 		free_array(&arr);
