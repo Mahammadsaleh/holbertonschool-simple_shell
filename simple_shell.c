@@ -13,9 +13,9 @@ extern char **environ;
  *
  * Return: char ptr to ptr
  */
-char **line_devider(char *buffer, char **arr)
+char **line_divider(char *buffer, char **arr)
 {
-	char *token;
+		char *token;
 	int i = 0;
 
 	token = strtok(buffer, " \n\t");
@@ -36,19 +36,19 @@ char **line_devider(char *buffer, char **arr)
  */
 char *get_input(void)
 {
-	char *buffer = NULL;
-	size_t len = 0;
-	int read;
-	
-	read = getline(&buffer, &len, stdin);
-	if (read == -1)
-	{
-		free(buffer);
-		return (NULL);
-	}
-	if (buffer[read - 1] == '\n')
-		buffer[read - 1] = '\0';
-	return (buffer);
+	        char *buffer = NULL;
+        size_t len = 0;
+        int read;
+
+        read = getline(&buffer, &len, stdin);
+        if (read == -1)
+        {
+                free(buffer);
+                return (NULL);
+        }
+        if (buffer[read - 1] == '\n')
+                buffer[read - 1] = '\0';
+        return (buffer);
 }
 /**
  * path_handler - path handler
@@ -60,89 +60,91 @@ char *get_input(void)
  */
 int execute(char *buffer)
 {
-        int status = 0;
-        pid_t pid = fork();
+	int status = 0;
+	pid_t pid = fork();
 
-        if (pid == -1)
-        {
-                perror("ERROR");
-                free(buffer);
-                exit(EXIT_FAILURE);
-        }
-        else if (pid == 0)
-        {
-                char *arr[64];
-                line_devider(buffer, arr);
-                if (arr[0] == NULL)
-                {
-                        free(buffer);
-                        exit(EXIT_SUCCESS);
-                }
-                if (strcmp(arr[0], "env") == 0)
-                {
-                        char **env = environ;
+	if (pid == -1)
+	{
+		perror("ERROR");
+		free(buffer);
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+		char *arr[100];
+		line_divider(buffer, arr);
+		if (arr[0] == NULL)
+		{
+			free(buffer);
+			exit(EXIT_SUCCESS);
+		}
+		if (strcmp(arr[0], "env") == 0)
+		{
+			char **env = environ;
 
-                        while (*env != NULL)
-                        {
-                                printf("%s\n", *env);
-                                env++;
-                        }
-                        free(buffer);
-                        exit(EXIT_SUCCESS);
-                }
-                if (strchr(arr[0], '/') != NULL)
-                {
-                        if (access(arr[0], X_OK) == 0)
-                        {
-                                if (execve(arr[0], arr, environ) == -1)
-                                {
-                                        perror("execve");
-                                        free(buffer);
-                                        exit(EXIT_FAILURE);
-                                }
-                        }
-                }
-                else
-                {
-                        char *path = getenv("PATH");
-                        char *token;
-                        if (path == NULL)
-                        {
-                                fprintf(stderr, "./hsh: 1: %s: not found\n", arr[0]);
-                                free(buffer);
-                                exit(127);
-                        }
-                        token = strtok(path, ":");
-                        while (token != NULL)
-                        {
-                                char executable_path[256];
-                                snprintf(executable_path, sizeof(executable_path), "%s/%s", token, arr[0]);
-                                if (access(executable_path, X_OK) == 0)
-                                {
-                                        if (execve(executable_path, arr, environ) == -1)
-                                        {
-                                                perror("execve");
-                                                free(buffer);
-                                                exit(EXIT_FAILURE);
-                                        }
-                                }
-                                token = strtok(NULL, ":");
-                        }
-                }
-                fprintf(stderr, "./hsh: 1: %s: not found\n", arr[0]);
-                free(buffer);
-                exit(127);
-        }
-        else
-        {
-                waitpid(pid, &status, 0);
-                free(buffer);
-                if (WIFEXITED(status))
-                        status = WEXITSTATUS(status);
-                else
-                        status = 1;
-        }
-        return (status);
+			while (*env != NULL)
+			{
+				printf("%s\n", *env);
+				env++;
+			}
+			free(buffer);
+			exit(EXIT_SUCCESS);
+		}
+		if (strchr(arr[0], '/') != NULL)
+		{
+			if (access(arr[0], X_OK) == 0)
+			{
+				if (execve(arr[0], arr, environ) == -1)
+				{
+					perror("execve");
+					free(buffer);
+					exit(EXIT_FAILURE);
+				}
+			}
+		}
+		else
+		{
+			char *path = getenv("PATH");
+			char *token;
+			if (path == NULL)
+			{
+				char error_message[CHAR_BUFFER];
+				snprintf(error_message, sizeof(error_message), "./hsh: 1: %s: not found\n", arr[0]);
+				write(STDERR_FILENO, error_message, strlen(error_message));
+				free(buffer);
+				exit(127);
+			}
+			token = strtok(path, ":");
+			while (token)
+			{
+				char cmd[100];
+				snprintf(cmd, sizeof(cmd), "%s/%s", token, arr[0]);
+				if (access(cmd, X_OK) == 0)
+				{
+					if (execve(cmd, arr, environ) == -1)
+					{
+						perror("execve");
+						free(buffer);
+						exit(EXIT_FAILURE);
+					}
+				}
+				token = strtok(NULL, ":");
+			}
+		}
+		fprintf(stderr, "./hsh: 1: %s: not found\n", arr[0]);
+		free(buffer);
+		exit(127);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		free(buffer);
+		if (WIFEXITED(status))
+			status = WEXITSTATUS(status);
+		else
+			status = 1;
+	}
+	return (status);
 }
 /**
  * main - main func
