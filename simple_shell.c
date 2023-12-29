@@ -103,13 +103,14 @@ char *path_handler(char *file_name, char *path)
  *
  * Return: int
  */
-int main(int argc, char **argv)
+int main(void)
 {
 	extern char **environ;
 	char *buffer = NULL;
 	int status = 0;
 	pid_t pid;
 	char *path;
+	char *original_command;
 	while (1)
 	{
 		buffer = get_input();
@@ -123,9 +124,9 @@ int main(int argc, char **argv)
 		pid = fork();
 		if (pid == 0)
 		{
-			char *arr[argc * 100];
+			char *arr[100];
 			line_devider(buffer, arr);
-			char *original_command = strdup(arr[0]);
+			original_command = strdup(arr[0]);
 			path = getenv("PATH");
 			if (path == NULL || *path == '\0')
 			{
@@ -143,7 +144,7 @@ int main(int argc, char **argv)
 				else
 				{
 					char error_message[CHAR_BUFFER];
-					snprintf(error_message, sizeof(error_message), "%s: 1: %s: not found\n", argv[0], original_command);
+					snprintf(error_message, sizeof(error_message), "./hsh: 1: %s: not found\n",original_command);
 					write(STDERR_FILENO, error_message, strlen(error_message));
 					exit(127);
 				}
