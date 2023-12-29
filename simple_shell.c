@@ -143,7 +143,6 @@ int main(int argc, char **argv)
 			{
 				if (arr[0][0] == '/')
 				{
-					free(arr[0]);
 					arr[0] = path_handler(arr[0], path);
 					if (execve(arr[0], arr, environ) == -1)
 					{
