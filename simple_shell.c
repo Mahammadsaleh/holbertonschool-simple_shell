@@ -107,7 +107,6 @@ int main(int argc, char **argv)
 {
 	extern char **environ;
 	char *buffer = NULL;
-	size_t len = argc * 512;
 	int status = 0;
 	pid_t pid;
 	while (1)
@@ -125,8 +124,9 @@ int main(int argc, char **argv)
 		{
 			char *arr[100];
 			line_devider(buffer, arr);
-			char *path = getenv("PATH");
+			char *path;
 			char *original_command = strdup(arr[0]);
+			path = getenv("PATH");
 			if (path == NULL || *path == '\0')
 			{
 				if (arr[0][0] == '/')
