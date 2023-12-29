@@ -37,6 +37,7 @@ char **line_devider(char *buffer)
 		token = strtok(NULL, " \n\t");
 	}
 	arr[i] = NULL;
+	free(token);
 	return (arr);
 }
 /**
@@ -109,6 +110,7 @@ char *path_handler(char *file_name, char *path)
 		}
 		token = strtok(NULL, ":");
 	}
+	free(token);
 	return file_name;
 }
 /**
