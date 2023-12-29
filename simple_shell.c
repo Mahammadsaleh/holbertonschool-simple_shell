@@ -109,6 +109,7 @@ int main(int argc, char **argv)
 	char *buffer = NULL;
 	int status = 0;
 	pid_t pid;
+	char *path;
 	while (1)
 	{
 		buffer = get_input();
@@ -122,9 +123,8 @@ int main(int argc, char **argv)
 		pid = fork();
 		if (pid == 0)
 		{
-			char *arr[100];
+			char *arr[argc * 100];
 			line_devider(buffer, arr);
-			char *path;
 			char *original_command = strdup(arr[0]);
 			path = getenv("PATH");
 			if (path == NULL || *path == '\0')
