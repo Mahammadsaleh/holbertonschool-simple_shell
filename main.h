@@ -1,7 +1,14 @@
 #ifndef MAIN_H
 #define MAIN_H
-char **line_devider(char *buffer);
-char **get_input(char **buffer, size_t *len);
-void free_array(char ***arr);
-char *path_handler(char *file_name);
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+extern char **environ;
+
+int delim_counter(char *str, char *delim);
+char **token_parse(char *str, char *delim);
+char *check_file(char **path_arr, char *filepath, int *flag);
+int execute(char **args, char *filename, int *status);
+void _printenv(void);
 #endif
