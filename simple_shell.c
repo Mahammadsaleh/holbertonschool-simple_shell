@@ -18,7 +18,7 @@ char **line_devider(char *buffer, char **arr)
 	int i = 0;
 
 	token = strtok(buffer, " \n\t");
-	while (token != NULL)
+	while (token != NULL && i < 63)
 	{
 		arr[i++] = token;
 		token = strtok(NULL, " \n\t");
@@ -47,7 +47,7 @@ char *get_input(void)
 		return (NULL);
 	}
 	if (buffer[read - 1] == '\n')
-	 buffer[read - 1] = '\0';
+		buffer[read - 1] = '\0';
 	return (buffer);
 }
 /**
@@ -66,8 +66,8 @@ void free_array(char **arr)
 		free(arr[i]);
 	}
 	free(arr);
-	arr = NULL;
 }
+extern char **environ;
 /**
  * path_handler - path handler
  * @file_name: name of file
@@ -78,7 +78,6 @@ void free_array(char **arr)
  */
 int path_handler(char *buffer)
 {
-	extern char **environ;
 	int status = 0;
 	pid_t pid = fork();
 	if (pid == 0)
@@ -158,6 +157,12 @@ int path_handler(char *buffer)
 		}
 		else 
 			status = 1;
+	}
+	else if (pid == -1)
+	{
+		perror("fork");
+                free(buffer);
+                exit(EXIT_FAILURE);
 	}
 	return (status);
 }
