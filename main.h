@@ -8,5 +8,6 @@ extern char **environ;
 
 char **line_devider(char *buffer, char **arr);
 char *get_input(void);
-int execute(char *buffer);
+void free_array(char **arr);
+int path_handler(char *buffer);
 #endif

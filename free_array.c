@@ -1,3 +1,4 @@
+#include "main.h"
 /**
  * free_array - free array memory
  * @arr: buffer

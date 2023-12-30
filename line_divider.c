@@ -1,4 +1,5 @@
- /**
+#include "main.h"
+/**
  * line_devider - devide the line
  * @buffer: string
  *

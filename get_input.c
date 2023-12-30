@@ -1,3 +1,4 @@
+#include "main.h"
 /**
  * get_input - input part
  * @len: len

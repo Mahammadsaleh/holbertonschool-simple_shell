@@ -1,3 +1,7 @@
+#include "main.h"
+#include <stddef.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 /**
  * path_handler - path handler
  * @file_name: name of file
