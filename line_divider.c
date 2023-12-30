@@ -2,10 +2,11 @@
 /**
  * line_devider - devide the line
  * @buffer: string
+ * @arr: array
  *
  * Return: char ptr to ptr
  */
- char **line_devider(char *buffer, char **arr)
+char **line_devider(char *buffer, char **arr)
 {
 	char *token;
 	int i = 0;

@@ -8,6 +8,7 @@ int main(void)
 {
 	char *buffer = NULL;
 	int status = 0;
+
 	while (1)
 	{
 		buffer = get_input();

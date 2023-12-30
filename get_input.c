@@ -1,8 +1,6 @@
 #include "main.h"
 /**
  * get_input - input part
- * @len: len
- * @buffer: buff
  *
  * Return: void
  */

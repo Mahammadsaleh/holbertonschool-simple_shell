@@ -4,19 +4,20 @@
 #include <sys/wait.h>
 /**
  * path_handler - path handler
- * @file_name: name of file
  *
- * @path: path
+ * @buffer: buffer
  *
- * return: file_name
+ * Return: status
  */
- int path_handler(char *buffer)
+int path_handler(char *buffer)
 {
 	int status = 0;
 	pid_t pid = fork();
+
 	if (pid == 0)
 	{
 		char *argv[64];
+
 		line_devider(buffer, argv);
 		if (argv[0] == NULL)
 		{
@@ -51,6 +52,7 @@
 		{
 			char *path = getenv("PATH");
 			char *token;
+
 			if (path == NULL)
 			{
 				fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
@@ -61,7 +63,9 @@
 			while (token != NULL)
 			{
 				char executable_path[256];
-				snprintf(executable_path, sizeof(executable_path), "%s/%s", token, argv[0]);
+
+				snprintf(executable_path, sizeof(executable_path),
+						"%s/%s", token, argv[0]);
 				if (access(executable_path, X_OK) == 0)
 				{
 					if (execve(executable_path, argv, environ) == -1)
@@ -89,7 +93,7 @@
 		{
 			status = WEXITSTATUS(status);
 		}
-		else 
+		else
 			status = 1;
 	}
 	else if (pid == -1)
@@ -99,3 +103,4 @@
 		exit(EXIT_FAILURE);
 	}
 	return (status);
+}
