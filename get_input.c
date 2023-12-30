@@ -11,10 +11,9 @@ char *get_input(void)
 	int read;
 
 	if (isatty(STDIN_FILENO))
-	{
 		printf("$ ");
-		read = getline(&buffer, &len, stdin);
-	}
+	read = getline(&buffer, &len, stdin);
+	
 	if (read == -1)
 	{
 		free(buffer);
