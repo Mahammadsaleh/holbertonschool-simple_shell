@@ -36,8 +36,9 @@ char **line_devider(char *buffer, char **arr)
 char *get_input(void)
 {
 	char *buffer = NULL;
-    size_t len = 0;
+	size_t len = 0;
 	int read;
+
 	if (isatty(STDIN_FILENO))
 		printf("$ ");
 	read = getline(&buffer, &len, stdin);
@@ -82,7 +83,7 @@ int path_handler(char *buffer)
 	pid_t pid = fork();
 	if (pid == 0)
 	{
-		char **argv = malloc(sizeof(char *) * 64);
+		char *argv[64];
 		line_devider(buffer, argv);
 		if (argv[0] == NULL)
 		{
