@@ -9,5 +9,8 @@ extern char **environ;
 char **line_devider(char *buffer, char **arr);
 char *get_input(void);
 void free_array(char **arr);
+void execute_command(char *buffer, char **argv);
+void handle_path(char *buffer, char **argv);
+void handle_env(char *buffer);
 int path_handler(char *buffer);
 #endif
