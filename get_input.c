@@ -13,7 +13,7 @@ char *get_input(void)
 	if (isatty(STDIN_FILENO))
 		printf("$ ");
 	read = getline(&buffer, &len, stdin);
-	
+
 	if (read == -1)
 	{
 		free(buffer);
