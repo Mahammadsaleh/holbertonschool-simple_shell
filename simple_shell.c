@@ -102,7 +102,7 @@ int path_handler(char *buffer)
 			free(buffer);
 			exit(EXIT_SUCCESS);
 		}
-		if (argv[0][0] == '/')
+		if (strchr(argv[0], '/') != NULL)
 		{
 			if (access(argv[0], X_OK) == 0)
 			{
