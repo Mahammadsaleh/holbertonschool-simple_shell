@@ -18,7 +18,7 @@ char **line_devider(char *buffer, char **arr)
 	int i = 0;
 
 	token = strtok(buffer, " \n\t");
-	while (token != NULL && i < 63)
+	while (token != NULL)
 	{
 		arr[i++] = token;
 		token = strtok(NULL, " \n\t");
@@ -36,7 +36,7 @@ char **line_devider(char *buffer, char **arr)
 char *get_input(void)
 {
 	char *buffer = NULL;
-        size_t len = 0;
+    size_t len = 0;
 	int read;
 	if (isatty(STDIN_FILENO))
 		printf("$ ");
@@ -47,7 +47,7 @@ char *get_input(void)
 		return (NULL);
 	}
 	if (buffer[read - 1] == '\n')
-                buffer[read - 1] = '\0';
+	 buffer[read - 1] = '\0';
 	return (buffer);
 }
 /**
@@ -76,27 +76,90 @@ void free_array(char **arr)
  *
  * return: file_name
  */
-char *path_handler(char *file_name, char *path)
+int path_handler(char *buffer)
 {
-	char *token = strtok(path, ":");
-	char cmd[100];
-	if (file_name[0] == '/')
+	extern char **environ;
+	int status = 0;
+	pid_t pid = fork();
+	if (pid == 0)
 	{
-		if (access(file_name, X_OK) == 0)
+		char **argv = malloc(sizeof(char *) * 64);
+		line_devider(buffer, argv);
+		if (argv[0] == NULL)
 		{
-			return strdup(file_name);
+			free(buffer);
+			exit(EXIT_SUCCESS);
 		}
+		if (strcmp(argv[0], "env") == 0)
+		{
+			char **env = environ;
+
+			while (*env != NULL)
+			{
+				printf("%s\n", *env);
+				env++;
+			}
+			free(buffer);
+			exit(EXIT_SUCCESS);
+		}
+		if (argv[0][0] == '/')
+		{
+			if (access(argv[0], X_OK) == 0)
+			{
+				if (execve(argv[0], argv, environ) == -1)
+				{
+					perror("execve");
+					free(buffer);
+					exit(EXIT_FAILURE);
+				}
+			}
+		}
+		else
+		{
+			char *path = getenv("PATH");
+			char *token;
+			if (path == NULL)
+			{
+				fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+				free(buffer);
+				exit(127);
+			}
+			token = strtok(path, ":");
+			while (token != NULL)
+			{
+				char executable_path[256];
+				snprintf(executable_path, sizeof(executable_path), "%s/%s", token, argv[0]);
+				if (access(executable_path, X_OK) == 0)
+				{
+					if (execve(executable_path, argv, environ) == -1)
+					{
+						perror("execve");
+						free(buffer);
+						exit(EXIT_FAILURE);
+					}
+				}
+				token = strtok(NULL, ":");
+			}
+		}
+		fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+		free(buffer);
+		exit(127);
 	}
-	while (token)
+	else if (pid > 0)
 	{
-		snprintf(cmd, sizeof(cmd), "%s/%s", token, file_name);
-		if (access(cmd, X_OK) == 0)
+		if (waitpid(pid, &status, 0) == -1)
 		{
-			return strdup(cmd);
+			perror("ERROR");
 		}
-		token = strtok(NULL, ":");
+		free(buffer);
+		if (WIFEXITED(status))
+		{
+			status = WEXITSTATUS(status);
+		}
+		else 
+			status = 1;
 	}
-	return strdup(file_name);
+	return (status);
 }
 /**
  * main - main func
@@ -105,12 +168,8 @@ char *path_handler(char *file_name, char *path)
  */
 int main(void)
 {
-	extern char **environ;
 	char *buffer = NULL;
 	int status = 0;
-	pid_t pid;
-	char *path;
-	char *original_command;
 	while (1)
 	{
 		buffer = get_input();
@@ -121,63 +180,11 @@ int main(void)
 			free(buffer);
 			exit(0);
 		}
-		pid = fork();
-		if (pid == 0)
+		status = path_handler(buffer);
+		if (status == 2)
 		{
-			char *arr[100];
-			line_devider(buffer, arr);
-			original_command = strdup(arr[0]);
-			path = getenv("PATH");
-			if (path == NULL || *path == '\0')
-			{
-				if (arr[0][0] == '/')
-				{
-					arr[0] = path_handler(arr[0], path);
-					if (execve(arr[0], arr, environ) == -1)
-					{
-						perror("ERROR");
-						free_array(arr);
-						free(buffer);
-						exit(1);
-					}
-				}
-				else
-				{
-					char error_message[CHAR_BUFFER];
-					snprintf(error_message, sizeof(error_message), "./hsh: 1: %s: not found\n",original_command);
-					write(STDERR_FILENO, error_message, strlen(error_message));
-					exit(127);
-				}
-			}
-			arr[0] = path_handler(arr[0], path);
-			if (execve(arr[0], arr, environ) == -1)
-			{
-				perror("ERROR");
-				exit(1);
-			}
+			exit(2);
 		}
-		else if (pid > 0)
-		{
-			if (waitpid(pid, &status, 0) == -1)
-			{
-				perror("ERROR");
-			}
-			if (WIFEXITED(status))
-			{
-				int exit_status = WEXITSTATUS(status);
-				if (exit_status == 127)
-				{
-					exit(127);
-				}
-			}
-		}
-		else
-		{
-			perror("ERROR");
-		}
-		if (pid == -1)
-			perror("ERROR");
 	}
-	free(buffer);
 	return (status);
 }
